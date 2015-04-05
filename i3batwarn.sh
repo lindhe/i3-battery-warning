@@ -74,12 +74,16 @@ if [ $PERCENT -le "$(echo $LIMIT)" ] && [ "$STAT" == "Discharging" ]; then
   #chek if nagbarfile is empty: else open new - to avoid multiples
   if [ ! -s $NAGBARPIDFILE ] ; then
         NAGBARSTATUS=$(DISPLAY=:0.0 /usr/bin/i3-nagbar -m "$(echo $MESSAGE)") &
-        NAGBARPID=$(ps -e | grep "nagbar" | sed -r 's/ ([0-9]*).*/\1/') #mind space in sed
+        NAGBARPID=$(ps -e | grep "nagbar" | awk '{ print $1 }' )
         echo $NAGBARPID > $NAGBARPIDFILE
     fi
 fi
+#warning, if the nagbar is closed manually the pidfile might not be emptied properly
+#for safety the charging requirement below is relaxed, if you use the nagbar for other reasons
+#it might get closed accidentaly by this
 
-if [ $PERCENT -ge "$(echo $LIMIT)" ] && [ "$STAT" == "Charging" ]; then
+if [ $PERCENT -ge "$(echo $LIMIT)" ] #&& [ "$STAT" == "Charging" ]; then
+then
     if [ -s $NAGBARPIDFILE ] ; then
         killall i3-nagbar
         rm $NAGBARPIDFILE
