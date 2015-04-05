@@ -61,13 +61,28 @@ FULL=`grep "POWER_SUPPLY_ENERGY_FULL_DESIGN" $ACPI_PATH/uevent | cut -d= -f2`
 PERCENT=`echo $(( $REM * 100 / $FULL ))`
 
 # set error message
-MESSAGE="AWW SNAP! I am running out of juice ...  Please, charge me or I'll have to power down."
+MESSAGE="Low battery warning, find charger"
 
 # set energy limit in percent, where warning should be displayed
-LIMIT="10"
+LIMIT="15"
+
+NAGBARPIDFILE="/home/spill/bin/gits/i3-battery-warning/nagbarpid_file"
 
 # show warning if energy limit in percent is less then user set limit and
 # if battery is discharging
 if [ $PERCENT -le "$(echo $LIMIT)" ] && [ "$STAT" == "Discharging" ]; then
-    DISPLAY=:0.0 /usr/bin/i3-nagbar -m "$(echo $MESSAGE)"
+  #chek if nagbarfile is empty: else open new - to avoid multiples
+  if [ ! -s $NAGBARPIDFILE ] ; then
+        NAGBARSTATUS=$(DISPLAY=:0.0 /usr/bin/i3-nagbar -m "$(echo $MESSAGE)") &
+        NAGBARPID=$(ps -e | grep "nagbar" | sed -r 's/ ([0-9]*).*/\1/') #mind space in sed
+        echo $NAGBARPID > $NAGBARPIDFILE
+    fi
+fi
+
+if [ $PERCENT -ge "$(echo $LIMIT)" ] && [ "$STAT" == "Charging" ]; then
+    if [ -s $NAGBARPIDFILE ] ; then
+        killall i3-nagbar
+        rm $NAGBARPIDFILE
+        touch $NAGBARPIDFILE
+  fi
 fi
