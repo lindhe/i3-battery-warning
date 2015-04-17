@@ -82,10 +82,10 @@ fi
 #for safety the charging requirement below is relaxed, if you use the nagbar for other reasons
 #it might get closed accidentaly by this
 
-if [ $PERCENT -ge "$(echo $LIMIT)" ] #&& [ "$STAT" == "Charging" ]; then
+if [ $PERCENT -gt "$(echo $LIMIT)" ] #&& [ "$STAT" == "Charging" ]; then
 then
     if [ -s $NAGBARPIDFILE ] ; then
-        killall i3-nagbar
+        kill $(cat $NAGBARPIDFILE)
         rm $NAGBARPIDFILE
         touch $NAGBARPIDFILE
   fi
