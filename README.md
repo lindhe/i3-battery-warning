@@ -20,3 +20,5 @@ fork changes
 added a pidfile where the pid of each (one max) nagbar is saved
 
 and a check to kill the nagbar if the battery is above the limit.
+
+> this usually works but sometimes the nagbar has to be closed manually
