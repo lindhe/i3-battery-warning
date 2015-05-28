@@ -75,7 +75,13 @@ if [ $PERCENT -le "$(echo $LIMIT)" ] && [ "$STAT" == "Discharging" ]; then
     if [ ! -s $NAGBARPIDFILE ] ; then
         /usr/bin/i3-nagbar -m "$(echo $MESSAGE)" &
         echo $! > $NAGBARPIDFILE
-    fi
+    elif ps -e | grep $(cat $NAGBARPIDFILE) | grep "i3-nagbar"; then
+        echo "pidfile in order, nothing to do"
+    else
+        rm $NAGBARPIDFILE
+        /usr/bin/i3-nagbar -m "$(echo $MESSAGE)" &
+        echo $! > $NAGBARPIDFILE
+    fi #else if, nagbarpid points to something else create new.
 fi
 #warning, if the nagbar is closed manually the pidfile might not be emptied properly
 #for safety the charging requirement below is relaxed, if you use the nagbar for other reasons
@@ -86,6 +92,8 @@ then
     if [ -s $NAGBARPIDFILE ] ; then
         if ps -e | grep $(cat $NAGBARPIDFILE) | grep "i3-nagbar"; then
             kill $(cat $NAGBARPIDFILE)
+            rm $NAGBARPIDFILE
+        else
             rm $NAGBARPIDFILE
         fi
     fi
