@@ -66,7 +66,8 @@ MESSAGE="Low battery warning, find charger"
 # set energy limit in percent, where warning should be displayed
 LIMIT="15"
 
-NAGBARPIDFILE="/home/spill/bin/gits/i3-battery-warning/nagbarpid_file"
+I3BAT_TMPDIR=$(mktemp --directory --tmpdir i3batwarn.XXX)
+NAGBARPIDFILE="$I3BAT_TMPDIR/nagbarpid_file"
 
 # show warning if energy limit in percent is less then user set limit and
 # if battery is discharging
