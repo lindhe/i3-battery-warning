@@ -99,3 +99,5 @@ then
         fi
     fi
 fi
+
+rm -r $I3BAT_TMPDIR
